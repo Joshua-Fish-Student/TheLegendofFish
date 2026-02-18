@@ -48,7 +48,8 @@ public class ChestDemo : MonoBehaviour {
         player.cameraFollow.enabled = false;
         player.cameraFollow.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y + 5.6f, transform.position.z - 10);
         player.cameraFollow.gameObject.GetComponent<Camera>().orthographicSize = 3.5f;
-        if (itemDrop) spawnedObject = Instantiate(itemDrop, new Vector3(player.transform.position.x, player.transform.position.y + 1f, player.transform.position.z), Quaternion.identity);
+        if (itemDrop) spawnedObject = Instantiate(itemDrop, new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 1f), Quaternion.identity);
+        player.Recieve();
         if (!player.hasInteracted) TryContinue();
         player.hasInteracted = true;
     }
@@ -60,6 +61,7 @@ public class ChestDemo : MonoBehaviour {
             {
                 index = 0;
                 EndText();
+                player.FinishRecieve();
             }
             else if (!doneCollecting)
             {

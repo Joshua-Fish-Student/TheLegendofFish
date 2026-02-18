@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8620528746670308282}
   - component: {fileID: 5507414910893400823}
   - component: {fileID: 1253088626343970704}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Deffinately Not a Zol
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -107,6 +107,8 @@ MonoBehaviour:
   canSeePlayer: 0
   health: {fileID: 0}
   jumpPower: 100
+  damage: 2
+  attackRange: 5
 --- !u!114 &5507414910893400823
 MonoBehaviour:
   m_ObjectHideFlags: 0

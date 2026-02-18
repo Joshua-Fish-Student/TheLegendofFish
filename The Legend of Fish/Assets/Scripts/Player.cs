@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     public float jumpPower = 10f;
     public bool onGround = true;
     public LayerMask ground;
+    public LayerMask enemyMask;
     public GameObject interactTarget;
     public GameObject enemyTarget;
     [SerializeField] bool contact = false;
@@ -28,11 +29,15 @@ public class Player : MonoBehaviour
     public bool hasInteracted = false;
     public TMP_Text health;
     bool isDead = false;
+    Animator animator;
+    [SerializeField] GameObject sword;
+    [SerializeField] GameObject shield;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         cameraFollow = FindFirstObjectByType<FollowPlayer>();
+        animator = GetComponentInChildren<Animator>();
         StartCoroutine(AttackCoolDown());
     }
     IEnumerator AttackCoolDown()
@@ -52,21 +57,32 @@ public class Player : MonoBehaviour
     {
         float forward = GetInput.MoveInput.x;
         float side = GetInput.MoveInput.y;
-        if (GetInput.JumpInput && onGround) rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+        if (GetInput.JumpInput && onGround)
+        {
+            animator.SetTrigger("Jump");
+            rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+        }
         else moveDirection = new Vector3(forward * moveSpeed, rb.velocity.y, side * moveSpeed);
         rb.velocity = moveDirection;
-
+        float angle = Mathf.Atan2(side, -forward) * Mathf.Rad2Deg - 90;
+        angle = (angle + 360f) % 360;
+        if (forward != 0 || side != 0)
+        {
+            transform.rotation = Quaternion.Euler(0, angle, 0);
+            if(onGround) animator.SetBool("Moving",true);
+        }
+        else animator.SetBool("Moving", false);
         onGround = Physics.SphereCast(transform.position, 0.5f, Vector3.down, out RaycastHit hit, 0.5f, ground) && contact;
         if (GetInput.isActiveAndEnabled && GetInput.InteractInput && interactTarget) TryInteract();
-        else if (GetInput.isActiveAndEnabled && GetInput.AttackInput && enemyTarget) TryDamage();
+        else if (GetInput.isActiveAndEnabled && GetInput.AttackInput) TryDamage();
         else if (GetInput.PauseInput || GetInteractInput.PauseInput) Pause();
-        else if (GetInteractInput.isActiveAndEnabled && GetInteractInput.SubmitInput) TryContinue(); 
+        else if (interactTarget && GetInteractInput.isActiveAndEnabled && GetInteractInput.SubmitInput) TryContinue();
+        else ResetAnimations();
     }
     void TryContinue()
     {
         if (interactTarget.GetComponent<ChestDemo>()) interactTarget.GetComponent<ChestDemo>().TryContinue();
         else if (interactTarget.GetComponent<NPC>()) interactTarget.GetComponent<NPC>().TryContinue();
-            
     }
     void TryInteract()
     {
@@ -75,7 +91,8 @@ public class Player : MonoBehaviour
     }
     void TryDamage()
     {
-        if (enemyTarget.GetComponent<Health>() && !onCoolDown)
+        animator.SetBool("Attacking", true);
+        if (enemyTarget && enemyTarget.GetComponent<Health>() && !onCoolDown)
         {
             enemyTarget.GetComponent<Health>().health -= damageAmount;
             onCoolDown = true;
@@ -95,7 +112,7 @@ public class Player : MonoBehaviour
             if (interactTarget.GetComponent<ChestDemo>() && interactTarget.GetComponent<ChestDemo>().canOpen) interactTarget.GetComponentInChildren<TMP_Text>().text = "Open (B)";
             else if (interactTarget.GetComponent<NPC>() && !interactTarget.GetComponent<NPC>().isTalkingTo) interactTarget.GetComponentInChildren<TMP_Text>().text = "Talk (B)";
         }
-        else if (other.gameObject.CompareTag("Enemy")) enemyTarget = other.gameObject;
+        else if (other.gameObject.CompareTag("Enemy") && Physics.Raycast(transform.position, transform.forward, 2f, enemyMask)) enemyTarget = other.gameObject;
         else if (other.gameObject.CompareTag("Water") && !inWater)
         {
             moveSpeed /= 2;
@@ -146,6 +163,10 @@ public class Player : MonoBehaviour
             chest.index = 0;
         }
     }
+    void ResetAnimations()
+    {
+        if (animator.GetBool("Attacking")) animator.SetBool("Attacking", false);
+    }
     public void UpdateHealth()
     {
         if (!(GetComponent<Health>().health > 0))
@@ -154,5 +175,16 @@ public class Player : MonoBehaviour
             Pause();
         }
         else health.text = $"Health: {GetComponent<Health>().health}";
+    }
+    public void Recieve()
+    {
+        sword.SetActive(false);
+        shield.SetActive(false);
+        animator.SetTrigger("Collect");
+    }
+    public void FinishRecieve()
+    {
+        sword.SetActive(true);
+        shield.SetActive(true);
     }
 }

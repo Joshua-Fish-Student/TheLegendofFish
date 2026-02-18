@@ -657,6 +657,7 @@ GameObject:
   - component: {fileID: 136306802490482818}
   - component: {fileID: 3776971299835600351}
   - component: {fileID: 1704675393080852441}
+  - component: {fileID: 1589239700728267231}
   m_Layer: 0
   m_Name: PolyArtWizardStandardMat
   m_TagString: Interact Object
@@ -760,6 +761,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isTalkingTo: 0
+  dialogue: []
+  text: {fileID: 0}
+  index: 0
+  doneTalkingTo: 0
+--- !u!208 &1589239700728267231
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1248815240492774}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 1.5, y: 1, z: 1.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 1, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &1251583507443948
 GameObject:
   m_ObjectHideFlags: 0
