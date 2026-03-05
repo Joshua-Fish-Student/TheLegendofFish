@@ -23,6 +23,6 @@ public class InputSubscriptionInteract : MonoBehaviour
     {
         SubmitInput = _Input.Interacting.Submit.WasPressedThisFrame();
         PauseInput = _Input.Interacting.Pause.WasPressedThisFrame();
-        _Input.Interacting.Pause.WasPerformedThisFrame();
+        _Input.Interacting.Pause.WasPressedThisFrame();
     }
 }

@@ -416,8 +416,8 @@ MonoBehaviour:
   canSeePlayer: 0
   health: {fileID: 0}
   jumpPower: 150
-  damage: 5
-  attackRange: 5
+  damage: 10
+  attackRange: 2
 --- !u!114 &2563801761818980961
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -762,7 +762,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isTalkingTo: 0
   dialogue: []
-  text: {fileID: 0}
+  textbox: {fileID: 0}
+  textbg: {fileID: 0}
   index: 0
   doneTalkingTo: 0
 --- !u!208 &1589239700728267231
@@ -778,7 +779,7 @@ NavMeshObstacle:
   m_Extents: {x: 1.5, y: 1, z: 1.5}
   m_MoveThreshold: 0.1
   m_Carve: 1
-  m_CarveOnlyStationary: 1
+  m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 1, z: 0}
   m_TimeToStationary: 0.5
 --- !u!1 &1251583507443948
@@ -2709,7 +2710,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -9210942965896155599, guid: dac7dfd4d029a5641a6f954e0160bca5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2753,8 +2754,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: dac7dfd4d029a5641a6f954e0160bca5, type: 2}
+  m_sharedMaterial: {fileID: -9210942965896155599, guid: dac7dfd4d029a5641a6f954e0160bca5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2778,8 +2779,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -4,12 +4,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
 using UnityEditor;
-using UnityEditor.PackageManager.Requests;
-
 public class Player : MonoBehaviour
 {
     public InputSubscription GetInput;
     public InputSubscriptionInteract GetInteractInput;
+    public InputSubscriptionUI GetUIInput;
     public float moveSpeed = 1f;
     private Vector3 moveDirection;
     public Rigidbody rb;
@@ -27,17 +26,27 @@ public class Player : MonoBehaviour
     bool onCoolDown = false;
     [SerializeField] float delay;
     public bool hasInteracted = false;
-    public TMP_Text health;
+    public HeartHandler health;
     bool isDead = false;
     Animator animator;
     [SerializeField] GameObject sword;
     [SerializeField] GameObject shield;
+    [SerializeField] GameObject pauseUI;
+    public bool seen;
+    MusicHandler musicHandler;
+    public GameObject swordUI;
+    [SerializeField] TMP_Text infoUI;
+    public int moneys;
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1f;
         rb = GetComponent<Rigidbody>();
         cameraFollow = FindFirstObjectByType<FollowPlayer>();
         animator = GetComponentInChildren<Animator>();
+        musicHandler = FindObjectOfType<MusicHandler>();
+        //Pause(true);
+        //Pause(false);
         StartCoroutine(AttackCoolDown());
     }
     IEnumerator AttackCoolDown()
@@ -52,9 +61,17 @@ public class Player : MonoBehaviour
             }
         }
     }
+    //late update to not break pausing
+    void LateUpdate()
+    {
+        if ((GetInput.PauseInput && GetInput.isActiveAndEnabled) || (GetInteractInput.PauseInput && GetInteractInput.isActiveAndEnabled) || (GetUIInput.PauseInput && GetUIInput.isActiveAndEnabled))
+            Pause(!isPaused);
+    }
     // Update is called once per frame
     void Update()
     {
+        if (seen) musicHandler.MusicSwitch("Combat");
+        else musicHandler.MusicSwitch("Ambient");
         float forward = GetInput.MoveInput.x;
         float side = GetInput.MoveInput.y;
         if (GetInput.JumpInput && onGround)
@@ -69,13 +86,18 @@ public class Player : MonoBehaviour
         if (forward != 0 || side != 0)
         {
             transform.rotation = Quaternion.Euler(0, angle, 0);
-            if(onGround) animator.SetBool("Moving",true);
+            if (onGround) animator.SetBool("Moving", true);
         }
         else animator.SetBool("Moving", false);
         onGround = Physics.SphereCast(transform.position, 0.5f, Vector3.down, out RaycastHit hit, 0.5f, ground) && contact;
-        if (GetInput.isActiveAndEnabled && GetInput.InteractInput && interactTarget) TryInteract();
+
+        if (GetInput.isActiveAndEnabled && GetInput.InteractInput && interactTarget)
+        {
+            musicHandler.MusicSwitch("Ambient");
+            TryInteract();
+        }
         else if (GetInput.isActiveAndEnabled && GetInput.AttackInput) TryDamage();
-        else if (GetInput.PauseInput || GetInteractInput.PauseInput) Pause();
+        //else if ((GetInput.PauseInput && GetInput.isActiveAndEnabled) || (GetInteractInput.PauseInput && GetInteractInput.isActiveAndEnabled) || (GetUIInput.PauseInput && GetUIInput.isActiveAndEnabled)) Pause(!isPaused);
         else if (interactTarget && GetInteractInput.isActiveAndEnabled && GetInteractInput.SubmitInput) TryContinue();
         else ResetAnimations();
     }
@@ -86,8 +108,18 @@ public class Player : MonoBehaviour
     }
     void TryInteract()
     {
-        if (interactTarget.GetComponent<ChestDemo>() && interactTarget.GetComponent<ChestDemo>().canOpen)interactTarget.GetComponent<ChestDemo>().Open();
-        else if (interactTarget.GetComponent<NPC>() && !interactTarget.GetComponent<NPC>().isTalkingTo && !interactTarget.GetComponent<NPC>().doneTalkingTo) interactTarget.GetComponent<NPC>().Talk();
+        if (interactTarget.GetComponent<ChestDemo>() && interactTarget.GetComponent<ChestDemo>().canOpen)
+        {
+            GetInput.enabled = false;
+            GetInteractInput.enabled = true;
+            interactTarget.GetComponent<ChestDemo>().Open();
+        }
+        else if (interactTarget.GetComponent<NPC>() && !interactTarget.GetComponent<NPC>().isTalkingTo && !interactTarget.GetComponent<NPC>().doneTalkingTo)
+        {
+            GetInput.enabled = false;
+            GetInteractInput.enabled = true;
+            interactTarget.GetComponent<NPC>().Talk();
+        }
     }
     void TryDamage()
     {
@@ -134,21 +166,33 @@ public class Player : MonoBehaviour
             inWater = false;
         }
     }
-    void Pause()
+    public void Pause(bool setTo)
     {
-        if (!isPaused)
+        infoUI.text = $"Speed: {moveSpeed}<br>Rubies: {moneys}";
+        if (setTo)
         {
+            musicHandler.VolumeSwitch(musicHandler.GetActive().volume / 2f);
+            if (!isPaused)EventSystem.current.SetSelectedGameObject(swordUI);
             Time.timeScale = 0f;
             isPaused = true;
             cameraFollow.enabled = false;
+            pauseUI.SetActive(true);
+            GetInteractInput.enabled = false;
+            GetInput.enabled = false;
+            GetUIInput.enabled = true;
         }
         else if (!isDead)
         {
+            musicHandler.VolumeSwitch(musicHandler.GetActive().volume * 2f);
             Time.timeScale = 1f;
             isPaused = false;
             cameraFollow.enabled = true;
+            pauseUI.SetActive(false);
+            if (hasInteracted)GetInteractInput.enabled = true;
+            else GetInput.enabled = true;
+            GetUIInput.enabled = false;
         }
-        
+
     }
     void ResetAllIndices()
     {
@@ -167,14 +211,15 @@ public class Player : MonoBehaviour
     {
         if (animator.GetBool("Attacking")) animator.SetBool("Attacking", false);
     }
-    public void UpdateHealth()
+    public void UpdateHealth(int damage)
     {
+        GetComponent<Health>().health -= damage;
         if (!(GetComponent<Health>().health > 0))
         {
             isDead = true;
-            Pause();
+            Pause(true);
         }
-        else health.text = $"Health: {GetComponent<Health>().health}";
+        else health.UpdateHearts(GetComponent<Health>().health);
     }
     public void Recieve()
     {

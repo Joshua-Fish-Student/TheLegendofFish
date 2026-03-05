@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -37,16 +38,25 @@ public class MeleeEnemy : MonoBehaviour
         {
             navMeshAgent.isStopped = false;
             if (animator) animator.SetBool("CanSeePlayer", true);
+            
             chasePlayer();
         }
         else
         {
             navMeshAgent.SetDestination(startLocation.position);
             if (animator) animator.SetBool("CanSeePlayer", false);
+            //bool nearbyAlly = false;
+            //MeleeEnemy[] enemies = FindObjectsOfType<MeleeEnemy>();
+            //foreach (var enemy in enemies)
+            //{
+            //    if (enemy.canSeePlayer) nearbyAlly = true;
+            //}
+            //if (!nearbyAlly)player.seen = false;
         }
     }
     void chasePlayer()
     {
+        //player.seen = true;
         NavMeshHit hit;
         Vector3 target = new Vector3(transform.position.x, transform.position.y - 2, transform.position.z);
         NavMesh.Raycast(transform.position, target, out hit, groundMask);
@@ -66,12 +76,12 @@ public class MeleeEnemy : MonoBehaviour
     }
     void TryAttackPlayer()
     {
-        if (Physics.Raycast(transform.position, player.transform.position, attackRange, playerMask) && !onCoolDown) DamagePlayer();
+        float distance = Vector3.Distance(transform.position, player.transform.position);
+        if (distance <= attackRange && !onCoolDown) StartCoroutine(Attack(distance));
     }
     void DamagePlayer()
     {
-        player.gameObject.GetComponent<Health>().health -= damage;
-        player.UpdateHealth();
+        player.UpdateHealth(damage);
         StartCoroutine(CoolDown());
         onCoolDown = true;
     }
@@ -80,4 +90,19 @@ public class MeleeEnemy : MonoBehaviour
         yield return new WaitForSeconds(5);
         onCoolDown = false;
     }
+    IEnumerator Attack(float distance)
+    {
+        yield return new WaitForSeconds(0.5f);
+        if (distance <= attackRange && !onCoolDown) DamagePlayer();
+    }
+    //private void OnDestroy()
+    //{
+    //    bool nearbyAlly = false;
+    //    MeleeEnemy[] enemies = FindObjectsOfType<MeleeEnemy>();
+    //    foreach (var enemy in enemies)
+    //    {
+    //        if (enemy.canSeePlayer) nearbyAlly = true;
+    //    }
+    //    if (player.seen && !nearbyAlly) player.seen = false;
+    //}
 }

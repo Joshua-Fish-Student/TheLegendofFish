@@ -107,7 +107,7 @@ MonoBehaviour:
   canSeePlayer: 0
   health: {fileID: 0}
   jumpPower: 100
-  damage: 2
+  damage: 5
   attackRange: 5
 --- !u!114 &5507414910893400823
 MonoBehaviour:

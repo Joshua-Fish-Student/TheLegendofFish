@@ -9,20 +9,21 @@ public class NPC : MonoBehaviour
     Player player;
     public bool isTalkingTo = false;
     [SerializeField] string[] dialogue;
-    [SerializeField] TMP_Text text;
+    [SerializeField] TMP_Text textbox;
+    [SerializeField] GameObject textbg;
     public int index = 0;
     public bool doneTalkingTo = false;
+    //[SerializeField] bool criteriaToChangeText;
+    //public bool doChange;
     void Start()
     {
         player = FindObjectOfType<Player>();
     }
     public void Talk()
     {
-        player.health.gameObject.SetActive(false);
+        //player.health.gameObject.SetActive(false);
         player.rb.velocity = Vector3.zero;
         doneTalkingTo = false;
-        player.GetInput.enabled = false;
-        player.GetInteractInput.enabled = true;
         MeleeEnemy[] enemies = FindObjectsOfType<MeleeEnemy>();
         foreach (var enemy in enemies)
         {
@@ -30,6 +31,7 @@ public class NPC : MonoBehaviour
         }
         isTalkingTo = true;
         GetComponentInChildren<TMP_Text>().text = "";
+        textbg.gameObject.SetActive(true);
         player.cameraFollow.enabled = false;
         player.cameraFollow.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y + 5.6f, transform.position.z - 10);
         player.cameraFollow.gameObject.GetComponent<Camera>().orthographicSize = 3.5f;
@@ -45,7 +47,7 @@ public class NPC : MonoBehaviour
         {
             yield return new WaitForSeconds(0.05f);
             words += c;
-            text.text = words;
+            textbox.text = words;
         }
     }
     public void TryContinue()
@@ -79,7 +81,8 @@ public class NPC : MonoBehaviour
             enemy.gameObject.SetActive(true);
         }
         player.rb.velocity = Vector3.zero;
-        text.text = "";
+        textbg.gameObject.SetActive(false);
+        textbox.text = "";
         player.health.gameObject.SetActive(true);
     }
     private void OnTriggerEnter(Collider other)
