@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ChestDemo : MonoBehaviour {
 
@@ -15,10 +16,12 @@ public class ChestDemo : MonoBehaviour {
     Player player;
     public bool isCollecting = false;
     [SerializeField] string[] dialogue;
-    [SerializeField] TMP_Text text;
+    [SerializeField] TMP_Text textbox;
+    [SerializeField] GameObject textbg;
     public int index = 0;
     public bool doneCollecting = false;
     GameObject spawnedObject;
+    public GameObject buttonImage;
 
     // Use this for initialization
     void Awake ()
@@ -31,11 +34,10 @@ public class ChestDemo : MonoBehaviour {
         player.rb.velocity = Vector3.zero;
         index = 0;
         chestAnim.SetTrigger("open");
-        player.GetInput.enabled = false;
-        player.GetInteractInput.enabled = true;
         canOpen = false;
         isCollecting = true;
         GetComponentInChildren<TMP_Text>().text = "";
+        textbg.gameObject.SetActive(true);
         MeleeEnemy[] enemies = FindObjectsOfType<MeleeEnemy>();
         foreach (var enemy in enemies)
         {
@@ -48,11 +50,13 @@ public class ChestDemo : MonoBehaviour {
         player.cameraFollow.enabled = false;
         player.cameraFollow.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y + 5.6f, transform.position.z - 10);
         player.cameraFollow.gameObject.GetComponent<Camera>().orthographicSize = 3.5f;
-        if (itemDrop) spawnedObject = Instantiate(itemDrop, new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - 1f), Quaternion.identity);
+        if (itemDrop) spawnedObject = Instantiate(itemDrop, new Vector3(transform.position.x - 0.75f, transform.position.y + 1f, transform.position.z - 0.5f), Quaternion.identity);
         player.Recieve();
         if (!player.hasInteracted) TryContinue();
         player.hasInteracted = true;
     }
+    bool typing = false;
+    bool skipping = false;
     public void TryContinue()
     {
         if (isCollecting && !doneCollecting)
@@ -63,11 +67,11 @@ public class ChestDemo : MonoBehaviour {
                 EndText();
                 player.FinishRecieve();
             }
-            else if (!doneCollecting)
+            else if (!doneCollecting && !typing)
             {
                 index++;
                 StartCoroutine(GiveInfo(dialogue[index-1]));
-            }
+            } else if (typing) skipping = true;
         }
     }
     void EndText()
@@ -80,24 +84,30 @@ public class ChestDemo : MonoBehaviour {
         //player.cameraFollow.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y + 5.6f, transform.position.z - 10);
         player.cameraFollow.gameObject.GetComponent<Camera>().orthographicSize = 5f;
         MeleeEnemy[] enemies = FindObjectsOfType<MeleeEnemy>(true);
+        textbg.gameObject.SetActive(false);
         foreach (var enemy in enemies)
         {
             enemy.gameObject.SetActive(true);
         }
         player.rb.velocity = Vector3.zero;
-        text.text = "";
+        textbox.text = "";
         
         Destroy(spawnedObject);
     }
     IEnumerator GiveInfo(string sentence)
     {
+        typing = true;
         string words = "";
         foreach (char c in sentence)
         {
+            if (skipping) break;
             yield return new WaitForSeconds(0.05f);
             words += c;
-            text.text = words;
+            textbox.text = words;
         }
+        skipping = false;
+        typing = false;
+        textbox.text = sentence;
     }
     private void OnTriggerEnter(Collider other)
     {

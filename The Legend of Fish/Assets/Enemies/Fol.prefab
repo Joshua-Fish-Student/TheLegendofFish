@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 8620528746670308282}
   - component: {fileID: 5507414910893400823}
   - component: {fileID: 1253088626343970704}
+  - component: {fileID: 1061769694227648410}
   m_Layer: 8
-  m_Name: Deffinately Not a Zol
+  m_Name: Fol
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -107,8 +108,10 @@ MonoBehaviour:
   canSeePlayer: 0
   health: {fileID: 0}
   jumpPower: 100
-  damage: 2
+  damage: 5
   attackRange: 5
+  drops:
+  - {fileID: 621584630249350254, guid: af9d1131c788d454fa7dae4544fa99d2, type: 3}
 --- !u!114 &5507414910893400823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,6 +146,27 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 2
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!95 &1061769694227648410
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6777471401267759430}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 73553315fa5006c4db6da577ec417578, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &356331003123297737
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -165,7 +189,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b4896d8fa466e64fa2e41e255ab9609, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071067
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b4896d8fa466e64fa2e41e255ab9609, type: 3}
       propertyPath: m_LocalRotation.x
@@ -177,11 +201,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b4896d8fa466e64fa2e41e255ab9609, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b4896d8fa466e64fa2e41e255ab9609, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5b4896d8fa466e64fa2e41e255ab9609, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y

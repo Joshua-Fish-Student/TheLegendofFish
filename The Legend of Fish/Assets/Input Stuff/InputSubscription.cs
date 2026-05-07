@@ -10,6 +10,7 @@ public class InputSubscription : MonoBehaviour
     public bool InteractInput { get; private set;} = false;
     public bool AttackInput { get; private set; } = false;
     public bool PauseInput { get; private set; } = false;
+    public bool BlockInput { get; private set; } = false;
 
     InputSystem_Actions _Input = null;
 
@@ -22,6 +23,8 @@ public class InputSubscription : MonoBehaviour
         _Input.Player.Move.canceled += SetMovement;
         _Input.Player.Attack.started += Attack;
         _Input.Player.Attack.canceled += Attack;
+        _Input.Player.Block.started += Block;
+        _Input.Player.Block.canceled += Block;
     }
     private void OnDisable()
     {
@@ -29,6 +32,8 @@ public class InputSubscription : MonoBehaviour
         _Input.Player.Move.canceled -= SetMovement;
         _Input.Player.Attack.started -= Attack;
         _Input.Player.Attack.canceled -= Attack;
+        _Input.Player.Block.started -= Block;
+        _Input.Player.Block.canceled -= Block;
         _Input.Player.Disable();
     }
     void SetMovement(InputAction.CallbackContext ctx)
@@ -38,6 +43,10 @@ public class InputSubscription : MonoBehaviour
     void Attack(InputAction.CallbackContext ctx)
     {
         AttackInput = ctx.started;
+    }
+    void Block(InputAction.CallbackContext ctx)
+    {
+        BlockInput = ctx.started;
     }
     private void Update()
     {
