@@ -18,8 +18,7 @@ public class MeleeEnemy : MonoBehaviour
     Animator animator;
     [SerializeField] int damage = 2;
     [SerializeField] float attackRange = 5f;
-    bool onCoolDown = false;
-    // Start is called before the first frame update
+    public GameObject[] drops;
     void Awake()
     {
         player = FindObjectOfType<Player>();
@@ -27,6 +26,7 @@ public class MeleeEnemy : MonoBehaviour
         health = GetComponent<Health>();
         startLocation = GetComponent<Transform>();
         animator = GetComponent<Animator>();
+        if (!animator) animator = GetComponentInChildren<Animator>();
         //rb = GetComponent<Rigidbody>();
     }
 
@@ -60,12 +60,18 @@ public class MeleeEnemy : MonoBehaviour
         NavMeshHit hit;
         Vector3 target = new Vector3(transform.position.x, transform.position.y - 2, transform.position.z);
         NavMesh.Raycast(transform.position, target, out hit, groundMask);
-        if (!Physics.CheckSphere(transform.position, 1f, playerMask) && !NavMesh.Raycast(transform.position, target, out hit, groundMask)/*Physics.Raycast(transform.position, player.transform.position, Mathf.Infinity, groundMask)*/) navMeshAgent.SetDestination(player.gameObject.transform.position);
+        Vector3 raycastDir = player.transform.position - transform.position;
+        if (!Physics.CheckSphere(transform.position, 1f, playerMask) && !Physics.Raycast(transform.position, raycastDir, sightRange, wallMask) && !NavMesh.Raycast(transform.position, target, out hit, groundMask)){
+            /*Physics.Raycast(transform.position, player.transform.position, Mathf.Infinity, groundMask)*/
+            navMeshAgent.SetDestination(player.gameObject.transform.position);
+            //transform.LookAt(player.gameObject.transform.position);
+        }
         else if (hit.mask == NavMesh.GetAreaFromName("Jump"))
         {
             //rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
             if (animator) animator.SetTrigger("Jump");
             navMeshAgent.SetDestination(player.gameObject.transform.position);
+            
         }
         else
         {
@@ -77,24 +83,22 @@ public class MeleeEnemy : MonoBehaviour
     void TryAttackPlayer()
     {
         float distance = Vector3.Distance(transform.position, player.transform.position);
-        if (distance <= attackRange && !onCoolDown) StartCoroutine(Attack(distance));
+        if (distance <= attackRange) animator.SetBool("Attacking", true);
+        else animator.SetBool("Attacking", false);
     }
     void DamagePlayer()
     {
-        player.UpdateHealth(damage);
-        StartCoroutine(CoolDown());
-        onCoolDown = true;
+        float distance = Vector3.Distance(transform.position, player.transform.position);
+        if (distance <= attackRange) player.UpdateHealth(damage, gameObject);
     }
-    IEnumerator CoolDown()
+    private void OnDestroy()
     {
-        yield return new WaitForSeconds(5);
-        onCoolDown = false;
+        int index = Random.Range(1, 5 + drops.Length);
+        if (index <= drops.Length)
+            Instantiate(drops[index], transform.position, Quaternion.identity);
     }
-    IEnumerator Attack(float distance)
-    {
-        yield return new WaitForSeconds(0.5f);
-        if (distance <= attackRange && !onCoolDown) DamagePlayer();
-    }
+
+    //if (distance <= attackRange && !onCoolDown) DamagePlayer();
     //private void OnDestroy()
     //{
     //    bool nearbyAlly = false;

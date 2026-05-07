@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class NPC : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class NPC : MonoBehaviour
     [SerializeField] GameObject textbg;
     public int index = 0;
     public bool doneTalkingTo = false;
+    public GameObject buttonImage;
+    
     //[SerializeField] bool criteriaToChangeText;
     //public bool doChange;
     void Start()
@@ -40,15 +43,22 @@ public class NPC : MonoBehaviour
         player.hasInteracted = true;
         //StartCoroutine(EndTalk());
     }
+    bool typing = false;
+    bool skipping = false;
     IEnumerator Talk(string sentence)
     {
+        typing = true;
         string words = "";
         foreach (char c in sentence)
         {
+            if (skipping) break;
             yield return new WaitForSeconds(0.05f);
             words += c;
             textbox.text = words;
         }
+        skipping = false;
+        typing = false;
+        textbox.text = sentence;
     }
     public void TryContinue()
     {
@@ -59,11 +69,11 @@ public class NPC : MonoBehaviour
                 index = 0;
                 EndText();
             }
-            else if (!doneTalkingTo)
+            else if (!doneTalkingTo && !typing)
             {
                 StartCoroutine(Talk(dialogue[index]));
                 index++;
-            }
+            } else if (typing) skipping = true;
         }
     }
     void EndText()

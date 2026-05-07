@@ -10,7 +10,7 @@ public class InputSubscriptionUI : MonoBehaviour
     public bool BackInput { get; private set; } = false;
     public bool PauseInput { get; private set; } = false;
 
-    InputSystem_Actions _Input = null;
+    public InputSystem_Actions _Input = null;
 
     private void OnEnable()
     {
